@@ -1,5 +1,7 @@
 from cozmo_fsm import *
 from cozmo.util import Pose
+from Calibrator import Calibrate, AddWalls
+from Movement import DecideMove, ForwardCustom, TurnCustom
 
 class MazeNavigator(StateMachineProgram):
 
