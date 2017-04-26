@@ -1,0 +1,15 @@
+from cozmo_fsm import *
+from cozmo.util import Pose
+
+class MazeNavigator(StateMachineProgram):
+
+	$setup{
+
+		checkObject: ObjectSeen() 
+		checkObject =F=> Calibrate() =C=> AddWalls() =C=> 
+			decideMove: DecideMove()
+			decideMove =S=> ForwardCustom() =C=> TurnCustom() =C=> checkObject
+			decideMove =F=> TurnCustom() =C=> checkObject 
+		checkObject =S=> Say("I SEE IT")
+
+	}
