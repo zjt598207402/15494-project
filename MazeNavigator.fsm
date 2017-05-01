@@ -4,13 +4,19 @@ from Calibrator import Calibrate, AddWalls
 from Movement import DecideMove, ForwardCustom, TurnCustom
 
 class MazeNavigator(StateMachineProgram):
-
+	def __init__(self):
+        super().__init__(worldviewer=True)
+    def start(self, event=None):
+        global handle
+        handle = robot.loop.create_task(build_walls())
+        robot.loop.call_soon(super().start)
+        
 	$setup{
 
 		checkObject: ObjectSeen() 
 		checkObject =F=> Calibrate() =C=> AddWalls() =C=> 
 			decideMove: DecideMove()
-			decideMove =S=> ForwardCustom() =C=> TurnCustom() =C=> checkObject
+			decideMove =S=> ForwardCustom() =C=> checkObject
 			decideMove =F=> TurnCustom() =C=> checkObject 
 		checkObject =S=> Say("I SEE IT")
 
