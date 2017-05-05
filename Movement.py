@@ -92,17 +92,17 @@ class DecideMove(StateNode):
 
         print("Deciding Move")
         if self.parent.cozmo_head == 0:
-        	#turn left
-            if self.parent.walls[self.parent.cozmo_x,self.parent.cozmo_y][3] == 0:
-                self.parent.angle = 90
-                self.parent.cozmo_head = 3
-                self.post_failure()
-
-            #forward
-            elif self.parent.walls[self.parent.cozmo_x,self.parent.cozmo_y][0] == 0:
+        	#forward
+            if self.parent.walls[self.parent.cozmo_x,self.parent.cozmo_y][0] == 0:
                 self.parent.distance = 120
                 self.parent.cozmo_x -= 1
                 self.post_success()
+
+            #turn left
+            elif self.parent.walls[self.parent.cozmo_x,self.parent.cozmo_y][3] == 0:
+                self.parent.angle = 90
+                self.parent.cozmo_head = 3
+                self.post_failure()
 
             #turn right
             elif self.parent.walls[self.parent.cozmo_x,self.parent.cozmo_y][1] == 0:
@@ -117,15 +117,15 @@ class DecideMove(StateNode):
                 self.post_failure()
 
         if self.parent.cozmo_head == 1:
-            if self.parent.walls[self.parent.cozmo_x,self.parent.cozmo_y][0] == 0:
-                self.parent.angle = 90
-                self.parent.cozmo_head = 0
-                self.post_failure()
-                
-            elif self.parent.walls[self.parent.cozmo_x,self.parent.cozmo_y][1] == 0:
+            if self.parent.walls[self.parent.cozmo_x,self.parent.cozmo_y][1] == 0:
                 self.parent.distance = 120
                 self.parent.cozmo_y += 1
                 self.post_success()
+                
+            elif self.parent.walls[self.parent.cozmo_x,self.parent.cozmo_y][0] == 0:
+                self.parent.angle = 90
+                self.parent.cozmo_head = 0
+                self.post_failure()
 
             elif self.parent.walls[self.parent.cozmo_x,self.parent.cozmo_y][2] == 0:
                 self.parent.angle = -90
@@ -138,15 +138,15 @@ class DecideMove(StateNode):
                 self.post_failure()
 
         if self.parent.cozmo_head == 2:
-            if self.parent.walls[self.parent.cozmo_x,self.parent.cozmo_y][1] == 0:
-                self.parent.angle = 90
-                self.parent.cozmo_head = 1
-                self.post_failure()
-                
-            elif self.parent.walls[self.parent.cozmo_x,self.parent.cozmo_y][2] == 0:
+            if self.parent.walls[self.parent.cozmo_x,self.parent.cozmo_y][2] == 0:
                 self.parent.distance = 120
                 self.parent.cozmo_x += 1
                 self.post_success()
+                
+            elif self.parent.walls[self.parent.cozmo_x,self.parent.cozmo_y][1] == 0:
+                self.parent.angle = 90
+                self.parent.cozmo_head = 1
+                self.post_failure()
 
             elif self.parent.walls[self.parent.cozmo_x,self.parent.cozmo_y][3] == 0:
                 self.parent.angle = -90
@@ -159,15 +159,15 @@ class DecideMove(StateNode):
                 self.post_failure()
 
         if self.parent.cozmo_head == 3:
-            if self.parent.walls[self.parent.cozmo_x,self.parent.cozmo_y][2] == 0:
-                self.parent.angle = 90
-                self.parent.cozmo_head = 2
-                self.post_failure()
-                
-            elif self.parent.walls[self.parent.cozmo_x,self.parent.cozmo_y][3] == 0:
+            if self.parent.walls[self.parent.cozmo_x,self.parent.cozmo_y][3] == 0:
                 self.parent.distance = 120
                 self.parent.cozmo_y -= 1
                 self.post_success()
+                
+            elif self.parent.walls[self.parent.cozmo_x,self.parent.cozmo_y][2] == 0:
+                self.parent.angle = 90
+                self.parent.cozmo_head = 2
+                self.post_failure()
 
             elif self.parent.walls[self.parent.cozmo_x,self.parent.cozmo_y][0] == 0:
                 self.parent.angle = -90
@@ -194,4 +194,3 @@ class TurnCustom(Turn):
         if self.running: return
         print("Turning")
         self.angle = degrees(self.parent.angle)
-super().start()
