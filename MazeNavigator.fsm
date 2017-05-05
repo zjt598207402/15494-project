@@ -35,7 +35,7 @@ class MazeNavigator(StateMachineProgram):
         cv2.createTrackbar('threshContour','features',170,1000,lambda self: None)
         cv2.createTrackbar('threshold1','features',1000,1000,lambda self: None)
         cv2.createTrackbar('threshold2','features',1000,1000,lambda self: None)
-        cv2.createTrackbar('votes','features',20,1000,lambda self: None)
+        cv2.createTrackbar('votes','features',13,1000,lambda self: None)
         self.count = 0
         default_head_angle = -0.67
 
@@ -59,26 +59,28 @@ class MazeNavigator(StateMachineProgram):
     def user_annotate(self,image):
         if self.edges is None: return image
         lines = self.lines
+        MAX_LINES = 100
 
         if (lines is not None):
-            lines = mergeLines(lines, self.count)
+            if len(lines) < MAX_LINES:
+                lines = mergeLines(lines, self.count)
 
-            walls = getWalls(lines)
-            self.curWall = walls
-            print(walls)
+                walls = getWalls(lines)
+                self.curWall = walls
+                print(walls)
 
-            for line in lines:
-                cv2.line(image, (line[0], line[1]), (line[2], line[3]), (0, 0, 255), 2)
+                for line in lines:
+                    cv2.line(image, (line[0], line[1]), (line[2], line[3]), (0, 0, 255), 2)
         self.count = 1
         return image
 
     $setup{
-        initMaze() =C=>
+        initMaze() =C=> StateNode() =T(5)=>
         checkObject: ObjectSeen() 
         checkObject =F=> StateNode() =T(2)=> Build_walls() =C=> 
             decideMove: DecideMove()
             decideMove =S=> ForwardCustom() =C=> checkObject
-            decideMove =F=> TurnCustom() =C=> checkObject 
-        checkObject =S=> Say("I SEE IT")
+            decideMove =F=> TurnCustom() =C=> StateNode() =T(2)=> checkObject 
+        checkObject =S=> PickUpObject(cube1)
 
     }

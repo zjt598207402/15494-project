@@ -124,18 +124,28 @@ def isSideLine(line, slopeMin, slopeMax, minY):
     return False
 
 def getWalls(lines):
-    walls = [0, 0, 0]
+    walls = [(0,True), (0,True), (0, True)]
 
     for line in lines:
-        if isSideLine(line, 0.45, 0.85, 250):
-            walls[2] = 1
+        if isFrontLine(line, -0.2, 0.2, 0, 200):
+            walls[1] = (0, False)
+        elif isSideLine(line, 0.45, 0.85, 250):
+            walls[2] = (1, True)
         elif isSideLine(line, -0.85, -0.45, 250):
-            walls[0] = 1
-        elif isFrontLine(line, -0.2, 0.2, 300, 360):
-            walls[1] = 1
+            walls[0] = (1, True)
+        elif isFrontLine(line, -0.2, 0.2, 300, 375):
+            (wall, canChange) = walls[1]
+            if (canChange):
+                walls[1] = (1, True)
         else: 
             continue
-    return walls
+
+    output = []
+
+    for (wall,canChange) in walls:
+        output.append(wall) 
+
+    return output
 
 # def getFrontDistance(lines):
 #     midY = -1
