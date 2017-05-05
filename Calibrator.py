@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-from cozmo_fsm import *
 import math
 
 def lineDistance(line):
@@ -138,59 +137,9 @@ def getWalls(lines):
             continue
     return walls
 
-class Calibrate(StateNode):
-    def start(self, event= None):
-        if self.running: return
-        super().start(event)
-        print("Calibrating")
-        print("Walls: ", self.parent.walls)
-        print("Cozmo_X: ", self.parent.cozmo_x)
-        print("Cozmo_Y: ", self.parent.cozmo_y)
-        print("Head :", self.parent.cozmo_head)
+# def getFrontDistance(lines):
+#     midY = -1
 
-
-        cv2.namedWindow('features')
-        dummy = numpy.array([[0]*320])
-        cv2.imshow('features',dummy)
-        cv2.createTrackbar('minDistance','features',0,1000,lambda self: None)
-        cv2.createTrackbar('threshContour','features',170,1000,lambda self: None)
-        cv2.createTrackbar('threshold1','features',1000,1000,lambda self: None)
-        cv2.createTrackbar('threshold2','features',1000,1000,lambda self: None)
-        cv2.createTrackbar('votes','features',20,1000,lambda self: None)
-        self.count = 0
-        default_head_angle = -0.67
-
-        if (not math.isclose(self.robot._head_angle.degrees, default_head_angle, abs_tol=1)):
-            self.robot.set_head_angle(degrees(default_head_angle))
-
-        # super().start()
-
-    def user_image(self,image,gray):
-        print("getting_image")
-        threshContour = cv2.getTrackbarPos('threshContour', 'features')
-        threshold1 = cv2.getTrackbarPos('threshold1', 'features')
-        threshold2 = cv2.getTrackbarPos('threshold2', 'features')
-
-        ret, thresholded = cv2.threshold(gray, threshContour, 255, 0)
-        self.edges = cv2.Canny(thresholded, \
-            threshold1, threshold2, apertureSize = 3)
-        votes = cv2.getTrackbarPos('votes', 'features')
-        self.lines = cv2.HoughLinesP(self.edges,1,np.pi/180,votes)
-
-
-    def user_annotate(self,image):
-        if self.edges is None: return image
-        print("annotating image")
-        lines = self.lines
-
-        if (lines is not None):
-            lines = mergeLines(lines, self.count)
-
-            walls = getWalls(lines)
-            self.parent.curWall = walls
-            print(walls)
-
-            for line in lines:
-                cv2.line(image, (line[0], line[1]), (line[2], line[3]), (0, 0, 255), 2)
-        self.count = 1
-        return image
+#     for line in lines:
+#         if isFrontLine(line, -0.2, 0.2, 300, 360):
+#             

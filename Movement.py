@@ -194,4 +194,4 @@ class TurnCustom(Turn):
         if self.running: return
         print("Turning")
         self.angle = degrees(self.parent.angle)
-super().start()
+        super().start()

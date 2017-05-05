@@ -5,7 +5,8 @@ from Calibrator import mergeLines, getWalls
 class initMaze(StateNode):
     def start(self, event = None):
         if self.running: return
-        self.parent.walls = {(0,0):[0,0,0,0]}
+        self.parent.walls = {(0,0):[1,0,1,1]}
+        self.parent.visited = {}
         self.parent.cozmo_x = 0
         self.parent.cozmo_y =0
         self.parent.cozmo_head = 1
@@ -74,7 +75,7 @@ class MazeNavigator(StateMachineProgram):
     $setup{
         initMaze() =C=>
         checkObject: ObjectSeen() 
-        checkObject =F=> StateNode() =T(1)=> Build_walls() =C=> 
+        checkObject =F=> StateNode() =T(2)=> Build_walls() =C=> 
             decideMove: DecideMove()
             decideMove =S=> ForwardCustom() =C=> checkObject
             decideMove =F=> TurnCustom() =C=> checkObject 
