@@ -1,0 +1,39 @@
+Set cozmo's initial position as (0,0) (has nothing to do with his actual robot.pose)
+Then we draw the walls/maze as follow:
+Each box/grid is represented as a coordinate point, represented by a dictionary with tuples of coordinates as key and
+Each grid/key contains a tuple of 4 binarys representing whether there are left, top, right, bottom walls (0,0,0,0)
+
+
+
++--+--+--+--+--+
+|  |           |
++  +  +  +--+--+
+|  |  |  |     |
++  +  +  +  +  +
+|     |  |  |  |
++  +--+  +  +  +
+|     |     | x|
++--+--+--+--+--+
+
+track cozmo's position and heading(left,top,right,bottom) (can be a int value of 1,2,3,4, or strings) at all times
+Suppose cozmo starts at position x. doesn't matter what he sees at the beginning, set him as (0,0).
+Based on what he sees, in this case if his initial heading is top, then we'll add (0,1) as key into dictionary with value (1,0,1,0). 
+Meaning the box in front of him has coordinates (0,1), and has wall on left and right but not top or bottom.
+
+after adding the wall into the dictionary, we can search the dictionary for the grid in front of cozmo, and based on cozmo's heading, check whether the grid
+right in front of him is available or not. 
+
+If cozmo is heading top, then check the bottom wall of the grid on top of him.
+If cozmo is heading left, then check the right wall of the grid on left of him.
+If cozmo is heading right, then check the left wall of the grid on right of him.
+If cozmo is heading bottom, then check the top wall of the grid on bottom of him.
+
+if heading == top
+	if walls[(cozmo_x,cozmo_y+1)][3] == 0
+		move forward
+	else if walls[(cozmo_x,cozmo_y)][0] == 0
+		turn left
+	else if walls[(cozmo_x,cozmo_y)][2] == 0
+		turn right
+	else
+		turn 180
