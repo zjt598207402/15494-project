@@ -1,6 +1,6 @@
 from cozmo_fsm import *
 from Movement import DecideMove, ForwardCustom, TurnCustom, Build_walls
-from Calibrator import mergeLines, getWalls
+from Calibrator import mergeLines, getWalls, getDistanceForward
 
 class initMaze(StateNode):
     def start(self, event = None):
@@ -66,8 +66,10 @@ class MazeNavigator(StateMachineProgram):
                 lines = mergeLines(lines, self.count)
 
                 walls = getWalls(lines)
+                self.distanceForward = getDistanceForward(lines)
                 self.curWall = walls
                 print(walls)
+                print("MedianY: ", self.distanceForward)
 
                 for line in lines:
                     cv2.line(image, (line[0], line[1]), (line[2], line[3]), (0, 0, 255), 2)

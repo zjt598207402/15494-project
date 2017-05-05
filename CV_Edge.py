@@ -153,7 +153,36 @@ def getWalls(lines):
 
     return output
 
+def getDistanceForward(lines):
+    
 
+    maxY = -1
+    minY = -1
+
+    for line in lines:
+        if isFrontLine(line, -0.2, 0.2, 300, 375):
+
+            curMinY = getMinY(line)
+            curMaxY = getMaxY(line)
+
+            if maxY == -1:
+                maxY = curMaxY
+                minY = curMinY
+                continue
+
+            if curMinY < minY:
+                minY = curMinY
+
+            if curMaxY > maxY:
+                maxY = curMaxY
+
+    medianY = (maxY + minY) / 2
+
+    medianY_constant = 356.0
+    distance_constant = 133.35
+    wallDistance = (medianY / medianY_constant) * 133.35
+    wallBuffer = 19.5
+    return (wallDistance - wallBuffer)  
 
 
 class CV_Edge(StateMachineProgram):
@@ -198,6 +227,7 @@ class CV_Edge(StateMachineProgram):
             lines = mergeLines(lines, self.count)
 
             walls = getWalls(lines)
+            print("MedianY: ", getDistanceForward(lines))
             # self.parent.curWalls = walls
             print(walls)
 
