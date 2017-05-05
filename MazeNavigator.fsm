@@ -1,23 +1,83 @@
 from cozmo_fsm import *
-from cozmo.util import Pose
-from Calibrator import Calibrate, AddWalls
-from Movement import DecideMove, ForwardCustom, TurnCustom
+from Movement import DecideMove, ForwardCustom, TurnCustom, Build_walls
+from Calibrator import mergeLines, getWalls
+
+class initMaze(StateNode):
+    def start(self, event = None):
+        if self.running: return
+        self.parent.walls = {(0,0):[0,0,0,0]}
+        self.parent.cozmo_x = 0
+        self.parent.cozmo_y =0
+        self.parent.cozmo_head = 1
+        super().start(event)
+        self.post_completion()
+
+class ObjectSeen(StateNode):
+    def start(self, event = None):
+        if self.running: return
+        super().start(event)
+        print("Checking Object")
+        if cube1.is_visible:
+            print("POSTING SUCESS")
+            self.post_success()
+        else:
+            print("POSTING FAILURE")
+            self.post_failure()
 
 class MazeNavigator(StateMachineProgram):
-	def __init__(self):
-        super().__init__(worldviewer=True)
-    def start(self, event=None):
-        global handle
-        handle = robot.loop.create_task(build_walls())
-        robot.loop.call_soon(super().start)
-        
-	$setup{
+    def start(self):
+        super().start()
+        cv2.namedWindow('features')
+        dummy = numpy.array([[0]*320])
+        cv2.imshow('features',dummy)
+        cv2.createTrackbar('minDistance','features',0,1000,lambda self: None)
+        cv2.createTrackbar('threshContour','features',170,1000,lambda self: None)
+        cv2.createTrackbar('threshold1','features',1000,1000,lambda self: None)
+        cv2.createTrackbar('threshold2','features',1000,1000,lambda self: None)
+        cv2.createTrackbar('votes','features',20,1000,lambda self: None)
+        self.count = 0
+        default_head_angle = -0.67
 
-		checkObject: ObjectSeen() 
-		checkObject =F=> Calibrate() =C=> AddWalls() =C=> 
-			decideMove: DecideMove()
-			decideMove =S=> ForwardCustom() =C=> checkObject
-			decideMove =F=> TurnCustom() =C=> checkObject 
-		checkObject =S=> Say("I SEE IT")
+        if (not math.isclose(self.robot._head_angle.degrees, default_head_angle, abs_tol=1)):
+            self.robot.set_head_angle(degrees(default_head_angle))
 
-	}
+        # super().start()
+
+    def user_image(self,image,gray):
+        threshContour = cv2.getTrackbarPos('threshContour', 'features')
+        threshold1 = cv2.getTrackbarPos('threshold1', 'features')
+        threshold2 = cv2.getTrackbarPos('threshold2', 'features')
+
+        ret, thresholded = cv2.threshold(gray, threshContour, 255, 0)
+        self.edges = cv2.Canny(thresholded, \
+            threshold1, threshold2, apertureSize = 3)
+        votes = cv2.getTrackbarPos('votes', 'features')
+        self.lines = cv2.HoughLinesP(self.edges,1,np.pi/180,votes)
+
+
+    def user_annotate(self,image):
+        if self.edges is None: return image
+        lines = self.lines
+
+        if (lines is not None):
+            lines = mergeLines(lines, self.count)
+
+            walls = getWalls(lines)
+            self.curWall = walls
+            print(walls)
+
+            for line in lines:
+                cv2.line(image, (line[0], line[1]), (line[2], line[3]), (0, 0, 255), 2)
+        self.count = 1
+        return image
+
+    $setup{
+        initMaze() =C=>
+        checkObject: ObjectSeen() 
+        checkObject =F=> StateNode() =T(1)=> Build_walls() =C=> 
+            decideMove: DecideMove()
+            decideMove =S=> ForwardCustom() =C=> checkObject
+            decideMove =F=> TurnCustom() =C=> checkObject 
+        checkObject =S=> Say("I SEE IT")
+
+    }

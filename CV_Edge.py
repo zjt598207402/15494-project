@@ -8,7 +8,6 @@ import numpy as np
 from cozmo_fsm import *
 import math
 
-
 def lineDistance(line):
     return distance((line[0], line[1]), (line[2], line[3]))
 
@@ -22,7 +21,7 @@ def distance(pointA, pointB):
 
 def slope(line):
     if (line[2] - line[0] == 0):
-        return 0
+        return 1
     else:
         output = ((line[3] - line[1]) / (line[2] - line[0]))
         return output
@@ -105,7 +104,22 @@ def mergeLines(lines, count):
 def getMinY(line):
     return min(line[1], line[3])
 
-def isLine(line, slopeMin, slopeMax, minY):
+def getMaxY(line):
+    return max(line[1], line[3])
+
+def isFrontLine(line, slopeMin, slopeMax, minY, maxY):
+    lineSlope = slope(line)
+    # print(line)
+    # print(lineSlope)
+    # print()
+    lineMaxY = getMaxY(line)
+
+    if lineSlope > slopeMin and lineSlope < slopeMax \
+        and lineMaxY <= maxY and lineMaxY >= minY:
+        return True
+    return False
+
+def isSideLine(line, slopeMin, slopeMax, minY):
     lineSlope = slope(line)
     # print(line)
     # print(lineSlope)
@@ -119,11 +133,11 @@ def getWalls(lines):
     walls = [0, 0, 0]
 
     for line in lines:
-        if isLine(line, 0.4, 0.85, 275):
+        if isSideLine(line, 0.45, 0.85, 250):
             walls[2] = 1
-        elif isLine(line, -0.85, -0.4, 275):
+        elif isSideLine(line, -0.85, -0.45, 250):
             walls[0] = 1
-        elif isLine(line, -0.2, 0.2, 300):
+        elif isFrontLine(line, -0.2, 0.2, 300, 360):
             walls[1] = 1
         else: 
             continue
@@ -140,16 +154,21 @@ class CV_Edge(StateMachineProgram):
         cv2.namedWindow('features')
         dummy = numpy.array([[0]*320])
         cv2.imshow('features',dummy)
-        cv2.createTrackbar('minDistance','features',37,1000,lambda self: None)
+        cv2.createTrackbar('minDistance','features',0,1000,lambda self: None)
         cv2.createTrackbar('threshContour','features',170,1000,lambda self: None)
         cv2.createTrackbar('threshold1','features',1000,1000,lambda self: None)
         cv2.createTrackbar('threshold2','features',1000,1000,lambda self: None)
-        cv2.createTrackbar('votes','features',25,1000,lambda self: None)
+        cv2.createTrackbar('votes','features',20,1000,lambda self: None)
         self.count = 0
+        default_head_angle = -0.67
+
+        if (not math.isclose(self.robot._head_angle.degrees, default_head_angle, abs_tol=1)):
+            self.robot.set_head_angle(degrees(default_head_angle))
 
         super().start()
 
     def user_image(self,image,gray):
+
         threshContour = cv2.getTrackbarPos('threshContour', 'features')
         threshold1 = cv2.getTrackbarPos('threshold1', 'features')
         threshold2 = cv2.getTrackbarPos('threshold2', 'features')
@@ -169,6 +188,7 @@ class CV_Edge(StateMachineProgram):
             lines = mergeLines(lines, self.count)
 
             walls = getWalls(lines)
+            # self.parent.curWalls = walls
             print(walls)
 
             for line in lines:
