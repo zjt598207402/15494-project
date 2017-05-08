@@ -133,7 +133,7 @@ def getWalls(lines):
             walls[2] = (1, True)
         elif isSideLine(line, -0.85, -0.45, 250):
             walls[0] = (1, True)
-        elif isFrontLine(line, -0.2, 0.2, 300, 375):
+        elif isFrontLine(line, -0.2, 0.2, 320, 375):
             (wall, canChange) = walls[1]
             if (canChange):
                 walls[1] = (1, True)
@@ -149,31 +149,24 @@ def getWalls(lines):
 
 def getDistanceForward(lines):
     
-
-    maxY = -1
     minY = -1
 
     for line in lines:
         if isFrontLine(line, -0.2, 0.2, 300, 375):
 
             curMinY = getMinY(line)
-            curMaxY = getMaxY(line)
 
-            if maxY == -1:
-                maxY = curMaxY
+            if minY == -1:
                 minY = curMinY
                 continue
 
             if curMinY < minY:
                 minY = curMinY
 
-            if curMaxY > maxY:
-                maxY = curMaxY
+    print("MinY: ",minY)
 
-    medianY = (maxY + minY) / 2
-
-    medianY_constant = 356.0
-    distance_constant = 133.35
-    wallDistance = (medianY / medianY_constant) * 133.35
-    wallBuffer = 19.5
-    return (wallDistance - wallBuffer) 
+    minY_constant = 374.0
+    distance_constant = 139.7
+    wallDistance = (minY / minY_constant) * distance_constant
+    wallBuffer = 14
+    return (wallDistance - wallBuffer)  

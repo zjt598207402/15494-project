@@ -1,4 +1,5 @@
 from cozmo_fsm import *
+from Build_map import *
 
 class Build_walls(StateNode):
     def start(self, event=None):
@@ -85,7 +86,9 @@ class Build_walls(StateNode):
             #wall at right
             if self.parent.curWall[2] == 1:
                 self.parent.walls[(self.parent.cozmo_x, self.parent.cozmo_y-1)][0] = 1
-                
+        
+        runDrawing(self.parent.root, self.parent.canvas, self.parent.canvas_width, \
+            self.parent.canvas_height,self.parent.walls, self.parent.cozmo_x, self.parent.cozmo_y)
         self.post_completion()
 
 
@@ -98,7 +101,7 @@ class DecideMove(StateNode):
 
         right_angle = 93
         distance_forward = 120
-        back_angle = 180
+        back_angle = 193
 
         print("Deciding Move")
         print("dictionary:", self.parent.walls)
@@ -107,6 +110,8 @@ class DecideMove(StateNode):
             if self.parent.walls[self.parent.cozmo_x,self.parent.cozmo_y][0] == 0:
                 print("Forward0")
                 self.parent.distance = distance_forward
+                if self.parent.walls[self.parent.cozmo_x-1,self.parent.cozmo_y][0] == 1:
+                    self.parent.distance = self.parent.distanceForward
                 self.parent.cozmo_x -= 1
                 self.post_success()
 
@@ -135,6 +140,8 @@ class DecideMove(StateNode):
             if self.parent.walls[self.parent.cozmo_x,self.parent.cozmo_y][1] == 0:
                 print("Forward1")
                 self.parent.distance = distance_forward
+                if self.parent.walls[self.parent.cozmo_x,self.parent.cozmo_y+1][1] == 1:
+                    self.parent.distance = self.parent.distanceForward
                 self.parent.cozmo_y += 1
                 self.post_success()
                 
@@ -160,6 +167,8 @@ class DecideMove(StateNode):
             if self.parent.walls[self.parent.cozmo_x,self.parent.cozmo_y][2] == 0:
                 print("Forward2")
                 self.parent.distance = distance_forward
+                if self.parent.walls[self.parent.cozmo_x+1,self.parent.cozmo_y][2] == 1:
+                    self.parent.distance = self.parent.distanceForward
                 self.parent.cozmo_x += 1
                 self.post_success()
                 
@@ -185,6 +194,8 @@ class DecideMove(StateNode):
             if self.parent.walls[self.parent.cozmo_x,self.parent.cozmo_y][3] == 0:
                 print("Forward3")
                 self.parent.distance = distance_forward
+                if self.parent.walls[self.parent.cozmo_x,self.parent.cozmo_y-1][3] == 1:
+                    self.parent.distance = self.parent.distanceForward
                 self.parent.cozmo_y -= 1
                 self.post_success()
                 

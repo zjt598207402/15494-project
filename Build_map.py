@@ -16,6 +16,8 @@ def drawBox(canvas, x, y, walld,w1,w2,w3,w4):
         canvas.create_line(x-wallr, y+wallr, x+wallr, y+wallr, fill="black", width=2)
 
 def draw(canvas, width, height, wall_dict, coz_x, coz_y):
+    # because in tkinter y frows downward
+    coz_y = -coz_y
     centerx = width/2
     centery = height/2
     circler = 14
@@ -25,16 +27,14 @@ def draw(canvas, width, height, wall_dict, coz_x, coz_y):
     wall_list = list(wall_dict.keys())
     for i in wall_list:
         wallx, wally = i
+        #because in tkinter y grows downward
+        wally = -wally
         [w1,w2,w3,w4] = wall_dict[i]
         drawBox(canvas, centerx+walld*(wallx),centery+walld*(wally), walld, w1, w2, w3, w4)
         
 
-def runDrawing(width, height, wall_dict, coz_x, coz_y):
-    root = Tk()
-    canvas = Canvas(root, width=width, height=height)
-    canvas.pack()
-    draw(canvas, width, height, wall_dict, coz_x, coz_y, coz_head)
-    root.mainloop()
+def runDrawing(root, canvas, width, height, wall_dict, coz_x, coz_y):
+    canvas.delete("all")
+    draw(canvas, width, height, wall_dict, coz_x, coz_y)
+    root.update()
     print("bye!")
-
-runDrawing(500,500,hdict,0,0)

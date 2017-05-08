@@ -1,6 +1,8 @@
 from cozmo_fsm import *
 from Movement import DecideMove, ForwardCustom, TurnCustom, Build_walls
 from Calibrator import mergeLines, getWalls, getDistanceForward
+from tkinter import *
+
 
 class initMaze(StateNode):
     def start(self, event = None):
@@ -10,6 +12,12 @@ class initMaze(StateNode):
         self.parent.cozmo_x = 0
         self.parent.cozmo_y =0
         self.parent.cozmo_head = 1
+        self.parent.canvas_height = 500
+        self.parent.canvas_width = 500
+        self.parent.root = Tk()
+        self.parent.canvas = Canvas(self.parent.root, width=self.parent.canvas_width \
+            , height=self.parent.canvas_height)
+        self.parent.canvas.pack()
         super().start(event)
         self.post_completion()
 
@@ -69,7 +77,6 @@ class MazeNavigator(StateMachineProgram):
                 self.distanceForward = getDistanceForward(lines)
                 self.curWall = walls
                 print(walls)
-                print("MedianY: ", self.distanceForward)
 
                 for line in lines:
                     cv2.line(image, (line[0], line[1]), (line[2], line[3]), (0, 0, 255), 2)

@@ -155,33 +155,26 @@ def getWalls(lines):
 
 def getDistanceForward(lines):
     
-
-    maxY = -1
     minY = -1
 
     for line in lines:
         if isFrontLine(line, -0.2, 0.2, 300, 375):
 
             curMinY = getMinY(line)
-            curMaxY = getMaxY(line)
 
-            if maxY == -1:
-                maxY = curMaxY
+            if minY == -1:
                 minY = curMinY
                 continue
 
             if curMinY < minY:
                 minY = curMinY
 
-            if curMaxY > maxY:
-                maxY = curMaxY
+    print("MinY: ",minY)
 
-    medianY = (maxY + minY) / 2
-
-    medianY_constant = 356.0
-    distance_constant = 133.35
-    wallDistance = (medianY / medianY_constant) * 133.35
-    wallBuffer = 19.5
+    minY_constant = 374.0
+    distance_constant = 139.7
+    wallDistance = (minY / minY_constant) * distance_constant
+    wallBuffer = 10
     return (wallDistance - wallBuffer)  
 
 
